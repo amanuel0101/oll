@@ -9,40 +9,46 @@ PKGMS = {
         {
             "installer": "winget install {}",
             "search": "winget search {}",
-            "is_there": "winget"
+            "is_there": "winget",
+            "end": ""
         },
         "choco":
         {
             "installer": "choco install {}",
             "search": "choco search {}",
-            "is_there": "choco"
+            "is_there": "choco",
+            "end": ""
         },
         "scoop":
         {
             "installer": "scoop install {}",
             "search": "scoop search {}",
-            "is_there": "scoop"
+            "is_there": "scoop",
+            "end": ""
 
         },
         "oneget":
         {
             "installer": "Install-Package {} -ProviderName Chocolatey",
             "search": "Find-Package {}",
-            "is_there": ""
+            "is_there": "",
+            "end": ""
 
         },
         "npackd":
         {
             "installer": "npacked-cli install {}",
             "search": "npackd-cli search {}",
-            "is_there": "npacked-cli"
+            "is_there": "npacked-cli",
+            "end": ""
 
         },
         "----":
         {
             "installer": "...",
             "search": "...",
-            "is_there": "..."
+            "is_there": "...",
+            "end": "",
 
         }
     },
@@ -106,7 +112,12 @@ def oll(os_, pkg):
             encoding="utf-8"
         )
         out_ = resp.stdout
-        if re.search(PATT, out_, re.IGNORECASE):
+        end_ = 40
+        # find the first \n or none
+        I_out_ = out_.find('\n')
+        if I_out_ != -1:
+            end_ = I_out_
+        if re.search(PATT, out_[:end_], re.IGNORECASE):
             print(f"[{i}]: \U0000274C")
             continue
         aval_in.append(i)
