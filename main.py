@@ -7,7 +7,7 @@ PKGMS = {
         {
         "winget":
         {
-            "installer": "winget install {}",
+            "installer": "winget install [ID]",
             "search": "winget search {}",
             "is_there": "winget",
             "end": ""
@@ -21,7 +21,7 @@ PKGMS = {
         },
         "scoop":
         {
-            "installer": "scoop install {}",
+            "installer": "scoop install [NAME]",
             "search": "scoop search {}",
             "is_there": "scoop",
             "end": ""
@@ -42,24 +42,20 @@ PKGMS = {
             "is_there": "npacked-cli",
             "end": ""
 
-        },
-        "----":
-        {
-            "installer": "...",
-            "search": "...",
-            "is_there": "...",
-            "end": "",
-
-        }
+        },  
     },
-    "lin-x":{}
 }
 
 ##########################
 LOG = True
 FALLI = ["no"]
 PATT = r"\b(" + "|".join(FALLI) + r")\b"
+GITHUB_FALLI = ["GitHub API rate limit reached"]
+GITHUB_PATT = r"\b(" + "|".join(GITHUB_FALLI) + r")\b"
 ##########################
+
+
+#########################
 def red(str_): return f"\033[31m{str_}\033[0m"
 def green(str_): return f"\033[32m{str_}\033[0m"
 def yellow(str_): return f"\033[33m{str_}\033[0m"
@@ -102,32 +98,46 @@ def oll(os_, pkg):
             continue
         aval_pkgms.append(n)
     print(f"{blue('available pkgms')}: {green(aval_pkgms)}")
+
     aval_in = []
     for i in aval_pkgms:
+        print(f"[{i}]")
+        print(f"{yellow(PKGMS[os_][i]['installer'])}")
         resp = sp.run(
             (PKGMS[os_][i]["search"].format(pkg)).split(' '),
             shell=True,
-            capture_output=True,
+            #capture_output=True,
             text=True,
             encoding="utf-8"
         )
-        out_ = resp.stdout
-        end_ = 40
-        # find the first \n or none
-        I_out_ = out_.find('\n')
-        if I_out_ != -1:
-            end_ = I_out_
-        if re.search(PATT, out_[:end_], re.IGNORECASE):
-            print(f"[{i}]: \U0000274C")
-            continue
-        aval_in.append(i)
-    if len(aval_in) < 1:
-        print(error_("Package Not found"))
-        return 1
-    print(f"[------{green('found')}------]")
-    for i in aval_in:
-        print(f"[{i}]: \u2705")
+        print(f"{green('======================================================================================================================')}")
+        if resp.stderr:
+            print("errrrrr")
+            return 1
 
+        #out_ = resp.stdout
+        #end_ = 40
+        # find the first \n or none
+        #I_out_ = out_.find('\n')
+        #if I_out_ != -1:
+        #    end_ = I_out_
+        #if re.search(GITHUB_PATT, out_[:end_], re.IGNORECASE):
+        #    print(f"[{i}]: \U0000274C({out_.rstrip('\n')})")
+        #    continue
+        #if re.search(PATT, out_[:end_], re.IGNORECASE):
+        #    print(f"[{i}]: \U0000274C(pkg not found)")
+        #    continue
+        #aval_in.append(i)
+
+    #if len(aval_in) < 1:
+    #    print(error_("Package Not found"))
+    #    return 1
+
+    #print(f"[------{green('found')}------]")
+    #for i in aval_in:
+    #    print(f"{green('['+i+']')}: \u2705 ")
+    #    sp.run((PKGMS[os_][i]["search"].format(pkg)).split(' '),shell=True)
+    #    print(f"{green('======================================================================================================================')}")
 
 
 oss = "windows" #input("enter os name: ")
